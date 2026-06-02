@@ -25,13 +25,8 @@
 
   .item { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 38px; opacity: 0; transform: translateY(12px); }
   .item.show { animation: fadeIn 0.45s ease-out forwards; }
-  .item .dot { flex-shrink: 0; width: 14px; height: 14px; border-radius: 50%; margin-top: 6px; position:relative; }
-  .item .dot::after { content:''; position:absolute; inset:-7px; border-radius:50%; }
-  .item .dot .num { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:#fff; font-size:10px; font-weight:700; }
-  /* halo colors per item */
-  #item0 .dot::after { background:#f8d2cf; } #item1 .dot::after { background:#fce1c8; }
-  #item2 .dot::after { background:#e6cdee; } #item3 .dot::after { background:#d2e6f8; }
-  #item4 .dot::after { background:#d0f0e1; } #item5 .dot::after { background:#c8ebe4; }
+  .item .dot { flex-shrink: 0; width: 28px; height: 28px; border-radius: 50%; margin-top: 6px; position:relative; display:flex; align-items:center; justify-content:center; }
+  .item .dot .num { width: 16px; height: 16px; border-radius: 50%; display:flex; align-items:center; justify-content:center; color:#fff; font-size:10px; font-weight:700; position:relative; z-index:1; }
   .item .label { font-size: 0.65em; color: #b0a090; margin-bottom: 4px; letter-spacing: 1px; }
   .item .text { font-weight: 300; font-size: 1.15em; color: #2c2416; line-height: 1.5; display: block; }
 
@@ -56,7 +51,7 @@
 <body>
 <div style="width:100%;max-width:560px;">
 
-  <div class="card-outer">
+  <div class="card-outer" id="card-outer">
     <div class="corner tl"></div><div class="corner tr"></div>
     <div class="corner bl"></div><div class="corner br"></div>
     <div class="card" id="card">
@@ -86,7 +81,8 @@ const data = {
   ],
   center: "你想让女儿看到，妈妈也可以为自己活一次。",
   labels: ["深层动机","风险预警","内心防线","未来画面","意义锚点","共赢网络"],
-  colors: ['#c0392b','#e67e22','#8e44ad','#2980b9','#27ae60','#16a085']
+  colors: ['#c0392b','#e67e22','#8e44ad','#2980b9','#27ae60','#16a085'],
+  haloColors: ['#f8d2cf','#fce1c8','#e6cdee','#d2e6f8','#d0f0e1','#c8ebe4']
 };
 
 function run() {
@@ -111,7 +107,7 @@ function run() {
     data.analysis.forEach((t, i) => {
       html +=
         '<div class="item" id="item' + i + '">' +
-        '<span class="dot" style="background:' + data.colors[i] + '"><span class="num">' + (i+1) + '</span></span>' +
+        '<span class="dot" style="background:' + data.haloColors[i] + '"><span class="num" style="background:' + data.colors[i] + '">' + (i+1) + '</span></span>' +
         '<div><span class="label">' + data.labels[i] + '</span>' +
         '<span class="text">' + t + '</span></div></div>';
     });
@@ -129,6 +125,24 @@ function run() {
 }
 
 run();
+
+// Auto-scale card to fit screen
+function fitCard() {
+  const outer = document.getElementById('card-outer');
+  const availH = window.innerHeight - 40; // 20px padding top+bottom
+  const cardH = outer.scrollHeight;
+  if (cardH > availH) {
+    const scale = availH / cardH;
+    outer.style.transform = 'scale(' + scale + ')';
+    outer.style.transformOrigin = 'top center';
+    outer.style.marginBottom = '-' + (cardH * (1 - scale)) + 'px';
+  }
+  // Also set container width to match
+  document.querySelector('.card-outer').parentElement.style.maxWidth = (560 * Math.min(1, availH / cardH)) + 'px';
+}
+window.addEventListener('load', fitCard);
+window.addEventListener('resize', fitCard);
+setTimeout(fitCard, 2500); // after animation completes
 </script>
 </body>
 </html>
