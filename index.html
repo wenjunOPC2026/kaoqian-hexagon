@@ -3,404 +3,291 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>考前决策六边形 — Alice</title>
+<title>出发的理由 — Alice</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: "PingFang SC","Noto Sans SC",sans-serif; background: #f5f0eb; color: #2c2416; }
-  .container { max-width: 720px; margin: 0 auto; padding: 40px 20px 80px; }
+  body { font-family: "PingFang SC","Noto Sans SC",sans-serif; background: #f0ebe0; color: #2c2416; overflow-x: hidden; }
+
+  /* ── Card Back / Cover ── */
+  .card-cover { position: fixed; inset: 0; z-index: 100; background: #3a2a1a;
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+    transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s; }
+  .card-cover.flipped { transform: translateY(-110%); opacity: 0; pointer-events: none; }
+
+  .card-back { width: 340px; height: 480px; background: linear-gradient(145deg, #f5ede0, #e8d8c0);
+    border-radius: 18px; box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    position: relative; overflow: hidden; }
+  /* Outer border rings */
+  .card-back::before { content:''; position:absolute; inset:12px; border:2px solid #8b6a4a; border-radius:12px; opacity:.4; }
+  .card-back::after { content:''; position:absolute; inset:20px; border:1px solid #a09080; border-radius:10px; opacity:.3; }
+
+  /* Diamond pattern */
+  .back-pattern { position:absolute; inset:30px; display:grid; grid-template-columns:repeat(5,1fr); grid-template-rows:repeat(7,1fr); opacity:.08; }
+  .back-pattern span { border:1px solid #3a2a1a; }
+
+  .back-center { position:relative; z-index:1; text-align:center; }
+  .back-center .hex { font-size:3em; color:#8b6a4a; opacity:.6; margin-bottom:8px; }
+  .back-center h2 { font-size:1.6em; color:#3a2a1a; font-weight:300; letter-spacing:6px; }
+  .back-center .tap { font-size:.8em; color:#a09080; margin-top:24px; letter-spacing:2px; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:.4;} 50%{opacity:1;} }
+
+  /* Corner ornaments */
+  .corner { position:absolute; width:30px; height:30px; border-color:#8b6a4a; border-style:solid; opacity:.35; z-index:1; }
+  .corner.tl { top:24px; left:24px; border-width:2px 0 0 2px; border-radius:4px 0 0 0; }
+  .corner.tr { top:24px; right:24px; border-width:2px 2px 0 0; border-radius:0 4px 0 0; }
+  .corner.bl { bottom:24px; left:24px; border-width:0 0 2px 2px; border-radius:0 0 0 4px; }
+  .corner.br { bottom:24px; right:24px; border-width:0 2px 2px 0; border-radius:0 0 4px 0; }
+
+  /* ── Main Content ── */
+  .container { max-width: 660px; margin: 0 auto; padding: 40px 20px 80px; }
 
   .cover { text-align: center; padding: 60px 0 40px; }
-  .cover h1 { font-size: 2.4em; color: #3a2a1a; margin-bottom: 8px; }
-  .cover .sub { color: #8b7355; font-size: 1em; }
-  .cover .brand { color: #a09080; font-size: 0.85em; margin-top: 16px; }
+  .cover h1 { font-size: 2.6em; color: #3a2a1a; margin-bottom: 8px; letter-spacing: 4px; font-weight: 300; }
+  .cover .sub { color: #8b7355; font-size: 1em; margin-top: 8px; }
+  .cover .brand { color: #a09080; font-size: 0.85em; margin-top: 20px; }
 
-  .q-block { background: #fffaf5; border-radius: 12px; padding: 32px 28px; margin: 20px 0; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
-  .q-block .num { display: inline-block; width: 36px; height: 36px; line-height: 36px; border-radius: 50%; background: #8b6a4a; color: #fff; text-align: center; font-size: 1.1em; font-weight: 700; margin-bottom: 12px; }
-  .q-block .title { font-size: 1.2em; font-weight: 600; margin-bottom: 6px; }
-  .q-block .hint { font-size: 0.9em; color: #8b7355; font-style: italic; margin-bottom: 16px; }
-  .q-block label { display: block; font-size: 0.85em; color: #a09080; margin-bottom: 6px; font-weight: 600; }
-  .q-block input, .q-block textarea { width: 100%; padding: 12px 14px; border: 2px dashed #c4a882; border-radius: 8px; background: #fdfaf5; font-size: 1em; font-family: inherit; resize: vertical; transition: border-color 0.2s; }
+  .q-block { background: #fffaf5; border-radius: 12px; padding: 28px 24px; margin: 16px 0; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
+  .q-block.name-block { border-left: 3px solid #8b6a4a; }
+  .q-block .num { display: inline-block; width: 32px; height: 32px; line-height: 32px; border-radius: 50%; background: #8b6a4a; color: #fff; text-align: center; font-size: 1em; font-weight: 700; margin-bottom: 10px; }
+  .q-block .title { font-size: 1.15em; font-weight: 600; margin-bottom: 4px; }
+  .q-block .hint { font-size: 0.85em; color: #8b7355; margin-bottom: 12px; }
+  .q-block input, .q-block textarea { width: 100%; padding: 10px 12px; border: 2px dashed #c4a882; border-radius: 8px; background: #fdfaf5; font-size: 1em; font-family: inherit; resize: vertical; transition: border-color 0.2s; }
   .q-block input:focus, .q-block textarea:focus { outline: none; border-color: #8b6a4a; border-style: solid; }
-  .q-block textarea { min-height: 60px; }
-  .q-block input { height: 48px; }
+  .q-block textarea { min-height: 56px; }
+  .q-block input { height: 44px; }
 
-  .btn-wrap { text-align: center; margin: 40px 0; }
+  .btn-wrap { text-align: center; margin: 36px 0; }
   .btn { display: inline-block; padding: 14px 48px; border: none; border-radius: 30px; font-size: 1.15em; font-weight: 600; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; }
   .btn:active { transform: scale(0.97); }
   .btn-primary { background: #3a2a1a; color: #f5f0eb; }
   .btn-primary:hover { box-shadow: 0 4px 16px rgba(58,42,26,0.3); }
-  .btn-outline { background: transparent; border: 2px solid #8b6a4a; color: #8b6a4a; margin-left: 12px; }
-
-  .center-block { background: #fffaf5; border-radius: 12px; padding: 28px; margin: 20px 0; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
-  .center-block .title { font-size: 1.2em; font-weight: 600; margin-bottom: 6px; }
-  .center-block .hint { font-size: 0.85em; color: #8b7355; margin-bottom: 14px; }
-  .center-block input { width: 100%; padding: 12px 14px; border: 2px dashed #c4a882; border-radius: 8px; background: #fdfaf5; font-size: 1.05em; font-family: inherit; text-align: center; height: 48px; transition: border-color 0.2s; }
-  .center-block input:focus { outline: none; border-color: #8b6a4a; border-style: solid; }
-  .insight { margin-top: 14px; padding: 12px 18px; background: #fdf7f0; border-left: 3px solid #8b6a4a; border-radius: 6px; font-size: 0.9em; color: #5c3d20; line-height: 1.7; text-align: left; display: none; }
-  .insight::before { content: 'AI 发现了什么：'; display: block; font-weight: 700; font-size: 0.8em; color: #8b6a4a; margin-bottom: 4px; letter-spacing: 1px; }
-
-  .result { background: #fffaf5; border-radius: 12px; padding: 40px 16px; margin: 40px 0; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
-  .result h2 { font-size: 1.5em; color: #3a2a1a; margin-bottom: 8px; }
-  .result .subtitle { color: #8b7355; margin-bottom: 24px; }
-  canvas { display: block; margin: 0 auto; max-width: 100%; }
-
-  .download-tip { color: #a09080; font-size: 0.85em; margin-top: 16px; }
+  .btn-outline { background: transparent; border: 2px solid #8b6a4a; color: #8b6a4a; }
   .warn { color: #c0392b; font-size: 0.9em; margin-top: 8px; display: none; text-align: center; }
   .status { color: #8b6a4a; font-size: 0.85em; margin-top: 8px; text-align: center; }
 
-  .divider { text-align: center; color: #c4a882; margin: 32px 0; font-size: 0.85em; }
+  /* Card area */
+  .result { margin: 40px 0; text-align: center; }
+  .result h2 { font-size: 1.4em; color: #3a2a1a; margin-bottom: 20px; font-weight: 300; }
+  .card-text { background: linear-gradient(180deg, #fdfaf5 0%, #faf5ed 50%, #f5ede0 100%); border-radius: 16px; border: 2px solid #d8c8b0; padding: 40px 36px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); text-align: left; display: inline-block; max-width: 560px; width: 100%; position: relative; }
+
+  .card-loading { text-align: center; padding: 40px 0; }
+  .loading-msg { color: #8b6a4a; font-size: 1.05em; font-weight: 300; animation: pulse 2s infinite; }
+  .loading-dots { color: #c4a882; font-size: 1.5em; letter-spacing: 4px; margin-top: 8px; }
+  .loading-dots span { opacity: .2; }
+  .loading-dots span:nth-child(1) { animation: blink 1.5s infinite; }
+  .loading-dots span:nth-child(2) { animation: blink 1.5s .2s infinite; }
+  .loading-dots span:nth-child(3) { animation: blink 1.5s .4s infinite; }
+  .loading-dots span:nth-child(4) { animation: blink 1.5s .6s infinite; }
+  .loading-dots span:nth-child(5) { animation: blink 1.5s .8s infinite; }
+  @keyframes blink { 0%,100%{opacity:.15;} 50%{opacity:1;} }
+
+  .analysis-item { padding: 10px 0 10px 0; margin: 2px 0; font-size: 1.05em; color: #2c2416; line-height: 1.7; display: flex; align-items: flex-start; gap: 12px; }
+  .analysis-item .dot { flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%; text-align: center; line-height: 26px; font-size: 0.7em; font-weight: 700; color: #fff; margin-top: 2px; }
+  .analysis-item .label { display: block; font-size: 0.7em; color: #b0a090; font-weight: 400; margin-bottom: 1px; }
+  .analysis-item .text { font-weight: 300; }
+
+  .card-divider { height: 1px; background: #d8c8b0; margin: 28px 0 24px; }
+  .center-reveal { font-size: 1.35em; font-weight: 300; color: #2c1a0a; text-align: center; line-height: 1.8; }
+  .download-tip { color: #a09080; font-size: 0.85em; margin-top: 8px; }
+  canvas { display: none; }
 
   @media (max-width: 500px) {
-    .cover h1 { font-size: 1.6em; }
-    .q-block { padding: 24px 14px; }
+    .cover h1 { font-size: 1.8em; letter-spacing: 2px; }
+    .q-block { padding: 20px 14px; }
     .btn { padding: 12px 32px; font-size: 1em; }
+    .card-text { padding: 28px 16px; }
+    .card-back { width:280px; height:400px; }
   }
 </style>
 </head>
 <body>
-<div class="container">
 
+<!-- ── Cover: Card Back ── -->
+<div class="card-cover" id="card-cover" onclick="flipCard()">
+  <div class="card-back">
+    <div class="back-pattern"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+    <div class="corner tl"></div><div class="corner tr"></div>
+    <div class="corner bl"></div><div class="corner br"></div>
+    <div class="back-center">
+      <div class="hex">⬡</div>
+      <h2>出发的理由</h2>
+      <div class="tap">轻触翻开</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Form ── -->
+<div class="container" id="main-content">
   <div class="cover">
-    <h1>你的「为什么」</h1>
-    <p class="sub">考前决策六边形 · 一个自我对话练习</p>
+    <h1>出发的理由</h1>
+    <p class="sub">回答六个问题，生成一张属于你的答案卡片</p>
     <p class="brand">学姐爱丽丝 | 35岁脱产跨考 | 陪你做对的选择</p>
   </div>
 
-  <div class="divider">⬡ 填写下方六个问题，生成你的专属六边形 ⬡</div>
-
-  <div class="q-block">
-    <div class="num">1</div>
-    <div class="title">你为什么要考研？</div>
-    <div class="hint">不假思索，写下脑中冒出的第一个答案。再追问自己：我真正想要的是什么？</div>
-    <label>深层动机</label>
-    <input type="text" id="q1" placeholder="我想……">
+  <div class="q-block name-block">
+    <div class="title">这张卡片属于谁？</div>
+    <div class="hint">可以写真名、昵称、或任何你想被称呼的方式</div>
+    <input type="text" id="q-name" placeholder="写下你的名字">
   </div>
 
-  <div class="q-block">
-    <div class="num">2</div>
-    <div class="title">如果你主动放弃了，最可能的原因是什么？</div>
-    <div class="hint">提前看到路障，才不会被绊倒。</div>
-    <label>风险预警</label>
-    <input type="text" id="q2" placeholder="我最怕……">
-  </div>
-
-  <div class="q-block">
-    <div class="num">3</div>
-    <div class="title">有人说「都这个年纪了还瞎折腾」，你怎么回答？</div>
-    <div class="hint">只回答给自己听。这不是辩论文，是盔甲。</div>
-    <label>内心防线</label>
-    <input type="text" id="q3" placeholder="我会告诉自己……">
-  </div>
-
-  <div class="q-block">
-    <div class="num">4</div>
-    <div class="title">如果考上了，你的一天会是什么样子？</div>
-    <div class="hint">闭眼想象30秒。写下你看到、听到、闻到的第一个画面。越具体越好。</div>
-    <label>未来画面</label>
-    <textarea id="q4" placeholder="那一天，我（看到/听到/闻到）……"></textarea>
-  </div>
-
-  <div class="q-block">
-    <div class="num">5</div>
-    <div class="title">如果没有考上，但坚持到了最后，你会怎样跟朋友讲起？</div>
-    <label>意义锚点</label>
-    <input type="text" id="q5" placeholder="无论结果，我……">
-  </div>
-
-  <div class="q-block">
-    <div class="num">6</div>
-    <div class="title">有没有另外的人，会因为你的备考行动而变得更好？</div>
-    <div class="hint">会是谁、以什么方式？</div>
-    <label>共赢网络</label>
-    <input type="text" id="q6" placeholder="________ 会因为 ________">
-  </div>
-
-  <div class="center-block">
-    <div class="title">中间的那一句</div>
-    <div class="hint">点击「生成六边形」自动生成，也可以自己写</div>
-    <input type="text" id="q-center" placeholder="生成六边形时会自动填充……">
-    <div class="insight" id="insight"></div>
-  </div>
+  <div class="q-block"><div class="num">1</div><div class="title">你为什么要考研？</div><div class="hint">不假思索，写下脑中冒出的第一个答案。再追问自己：我真正想要的是什么？</div><input type="text" id="q1" placeholder="我想……"></div>
+  <div class="q-block"><div class="num">2</div><div class="title">如果你主动放弃了，最可能的原因是什么？</div><div class="hint">提前看到路障，才不会被绊倒。</div><input type="text" id="q2" placeholder="我最怕……"></div>
+  <div class="q-block"><div class="num">3</div><div class="title">有人说「都这个年纪了还瞎折腾」，你怎么回答？</div><div class="hint">只回答给自己听。这不是辩论文，是盔甲。</div><input type="text" id="q3" placeholder="我会告诉自己……"></div>
+  <div class="q-block"><div class="num">4</div><div class="title">如果考上了，你的一天会是什么样子？</div><div class="hint">闭眼想象30秒。写下你看到、听到、闻到的第一个画面。越具体越好。</div><textarea id="q4" placeholder="那一天，我（看到/听到/闻到）……"></textarea></div>
+  <div class="q-block"><div class="num">5</div><div class="title">如果没有考上，但坚持到了最后，你会怎样跟朋友讲起？</div><input type="text" id="q5" placeholder="无论结果，我……"></div>
+  <div class="q-block"><div class="num">6</div><div class="title">有没有另外的人，会因为你的备考行动而变得更好？</div><div class="hint">会是谁、以什么方式？</div><input type="text" id="q6" placeholder="________ 会因为 ________"></div>
 
   <div class="btn-wrap">
-    <button class="btn btn-primary" onclick="generateAndDraw()">⬡ 生成我的六边形</button>
-    <button class="btn btn-outline" onclick="downloadImage()">📥 下载图片</button>
+    <button class="btn btn-primary" onclick="generate()">✨ 生成我的答案卡片</button>
     <p class="warn" id="warn">请至少填写 3 个答案再生成。</p>
     <p class="status" id="status"></p>
   </div>
 
   <div class="result" id="result" style="display:none;">
-    <h2>我的考前决策六边形</h2>
-    <p class="subtitle">它不会替你考试，但它会在你想放弃的时候替你自己问一句：你当初为什么要出发？</p>
-    <canvas id="hexCanvas"></canvas>
-    <p class="download-tip">长按或右键可保存图片 · 发给一个你信任的人 · 或者挂在书桌前</p>
+    <h2 id="result-title">出发的理由</h2>
+    <div class="card-text" id="card-text">
+      <div class="card-loading" id="card-loading">
+        <p class="loading-msg">AI 正在读你的答案</p>
+        <p class="loading-dots"><span>·</span> <span>·</span> <span>·</span> <span>·</span> <span>·</span></p>
+      </div>
+      <div class="card-content" id="card-content" style="display:none"></div>
+    </div>
+    <button class="btn btn-outline" onclick="downloadImage()" style="margin-top:20px;">📥 保存为图片</button>
+    <canvas id="cardCanvas"></canvas>
+    <p class="download-tip">发给一个你信任的人 · 或者挂在书桌前</p>
   </div>
-
 </div>
 
 <script>
-function wrapText(ctx, text, maxWidth) {
-  const lines = [];
-  let current = '';
-  for (let ch of text) {
-    const test = current + ch;
-    if (ctx.measureText(test).width > maxWidth && current.length > 0) {
-      lines.push(current);
-      current = ch;
-    } else {
-      current = test;
-    }
-  }
-  if (current) lines.push(current);
-  return lines;
+function flipCard() { document.getElementById('card-cover').classList.add('flipped'); }
+
+const dotColors = ['#c0392b','#e67e22','#8e44ad','#2980b9','#27ae60','#16a085'];
+const labels = ['深层动机','风险预警','内心防线','未来画面','意义锚点','共赢网络'];
+
+function getValues() {
+  const v = [];
+  for (let i = 1; i <= 6; i++) v.push(document.getElementById('q'+i).value.trim());
+  return v;
+}
+function getName() { return document.getElementById('q-name').value.trim(); }
+
+function saveToBase(name, answers, center) {
+  fetch('http://localhost:8765/save', {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({name, answers, center})
+  }).catch(() => {});
 }
 
-// --- Auto center sentence ---
-async function autoCenter(values) {
-  // Try local AI server first (2s timeout)
-  try {
-    const ctrl = new AbortController();
-    const t = setTimeout(() => ctrl.abort(), 2000);
-    const resp = await fetch('http://localhost:8765/generate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ answers: values }),
-      signal: ctrl.signal
-    });
-    clearTimeout(t);
-    if (resp.ok) {
-      const data = await resp.json();
-      if (data.center) {
-        return { center: data.center, insight: data.insight || '' };
-      }
+function renderCard(center, analysis, name) {
+  name = name || '';
+  document.getElementById('card-loading').style.display = 'none';
+  document.getElementById('result-title').textContent = name ? name + ' 出发的理由' : '出发的理由';
+  const content = document.getElementById('card-content');
+  const list = document.getElementById('analysis-list') || document.createElement('div');
+  list.id = 'analysis-list';
+  list.innerHTML = '';
+  if (analysis && analysis.length === 6) {
+    for (let i = 0; i < 6; i++) {
+      list.innerHTML +=
+        '<div class="analysis-item">' +
+        '<span class="dot" style="background:' + dotColors[i] + '">' + (i+1) + '</span>' +
+        '<div><span class="label">' + labels[i] + '</span>' +
+        '<span class="text">' + analysis[i] + '</span></div>' +
+        '</div>';
     }
-  } catch (_) { /* fall through */ }
-
-  // Heuristic fallback
-  const motive = (values[0] || '').replace(/[。，.]/g, '');
-  const vision = (values[3] || '').replace(/[。，.]/g, '');
-  let phrase = (motive && vision) ? motive + '，' + vision
-    : motive || vision || (values.filter(v=>v).pop() || '').replace(/[。，.]/g, '');
-  if (phrase.length > 28) phrase = phrase.slice(0, 28);
-  return { center: phrase || '我的为什么', insight: '' };
+    list.innerHTML += '<div class="card-divider"></div>';
+  }
+  list.innerHTML += '<div class="center-reveal">' + center + '</div>';
+  content.innerHTML = '';
+  content.appendChild(list);
+  content.style.display = 'block';
 }
 
-// --- Draw ---
-async function generateAndDraw() {
-  const values = [];
-  for (let i = 1; i <= 6; i++) {
-    values.push(document.getElementById('q' + i).value.trim());
-  }
-  const filled = values.filter(v => v.length > 0).length;
-  if (filled < 3) {
+function showLoading() {
+  document.getElementById('card-loading').style.display = 'block';
+  document.getElementById('card-content').style.display = 'none';
+}
+
+async function generate() {
+  const values = getValues();
+  if (values.filter(v=>v.length>0).length < 3) {
     document.getElementById('warn').style.display = 'block';
     document.getElementById('result').style.display = 'none';
     return;
   }
   document.getElementById('warn').style.display = 'none';
-
-  const statusEl = document.getElementById('status');
-  statusEl.textContent = '⏳ 正在生成……';
-
-  // Auto-fill center
-  const centerInput = document.getElementById('q-center');
-  const insightEl = document.getElementById('insight');
-  if (!centerInput.value.trim()) {
-    const result = await autoCenter(values);
-    centerInput.value = result.center;
-    if (result.insight) {
-      insightEl.textContent = result.insight;
-      insightEl.style.display = 'block';
-    } else {
-      insightEl.style.display = 'none';
-    }
-  }
-  statusEl.textContent = '';
-
-  const qc = centerInput.value.trim();
-
   document.getElementById('result').style.display = 'block';
-  drawCanvas(values, qc);
+  showLoading();
+  setTimeout(() => document.getElementById('result').scrollIntoView({behavior:'smooth'}), 100);
 
-  setTimeout(() => {
-    document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
-  }, 100);
-}
-
-function drawCanvas(values, qc) {
-  const canvas = document.getElementById('hexCanvas');
-  const baseSize = Math.min(700, window.innerWidth - 40);
-  const dpr = window.devicePixelRatio || 1;
-  canvas.width = baseSize * dpr;
-  canvas.height = baseSize * dpr;
-  canvas.style.width = baseSize + 'px';
-  canvas.style.height = baseSize + 'px';
-
-  const ctx = canvas.getContext('2d');
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  ctx.clearRect(0, 0, baseSize, baseSize);
-
-  const cx = baseSize / 2;
-  const cy = baseSize / 2;
-  const R = baseSize * 0.33;
-
-  const shortLabels = ['深层动机', '风险预警', '内心防线', '未来画面', '意义锚点', '共赢网络'];
-  const colors = ['#c0392b','#e67e22','#8e44ad','#2980b9','#27ae60','#16a085'];
-
-  const vertices = [];
-  for (let i = 0; i < 6; i++) {
-    const angle = -Math.PI / 2 + (Math.PI / 3) * i;
-    vertices.push({ x: cx + R * Math.cos(angle), y: cy + R * Math.sin(angle), angle });
-  }
-
-  // --- background glow ---
-  const grad = ctx.createRadialGradient(cx, cy, R * 0.2, cx, cy, R * 1.3);
-  grad.addColorStop(0, 'rgba(139,106,74,0.06)');
-  grad.addColorStop(1, 'rgba(139,106,74,0.0)');
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, baseSize, baseSize);
-
-  // --- spokes ---
-  ctx.strokeStyle = 'rgba(180,160,140,0.3)';
-  ctx.lineWidth = 1;
-  ctx.setLineDash([4, 8]);
-  for (let i = 0; i < 6; i++) {
-    ctx.beginPath();
-    ctx.moveTo(cx, cy);
-    ctx.lineTo(vertices[i].x, vertices[i].y);
-    ctx.stroke();
-  }
-  ctx.setLineDash([]);
-
-  // --- filled radar area ---
-  const filledVerts = vertices.filter((_, i) => values[i].length > 0);
-  if (filledVerts.length >= 3) {
-    ctx.fillStyle = 'rgba(139,106,74,0.08)';
-    ctx.strokeStyle = 'rgba(139,106,74,0.2)';
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.moveTo(filledVerts[0].x, filledVerts[0].y);
-    for (let i = 1; i < filledVerts.length; i++) ctx.lineTo(filledVerts[i].x, filledVerts[i].y);
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
-  }
-
-  // --- outer hexagon ---
-  ctx.strokeStyle = '#8b6a4a';
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(vertices[0].x, vertices[0].y);
-  for (let i = 1; i < 6; i++) ctx.lineTo(vertices[i].x, vertices[i].y);
-  ctx.closePath();
-  ctx.stroke();
-
-  // --- vertex dots & labels ---
-  for (let i = 0; i < 6; i++) {
-    const v = vertices[i];
-    const filled = values[i].length > 0;
-
-    // dot
-    ctx.beginPath();
-    ctx.arc(v.x, v.y, 7, 0, Math.PI * 2);
-    ctx.fillStyle = filled ? colors[i] : '#d4c0a8';
-    ctx.fill();
-    if (filled) {
-      ctx.strokeStyle = '#fff';
-      ctx.lineWidth = 2;
-      ctx.stroke();
-    }
-
-    // label outside vertex
-    const dist = R + 32;
-    const lx = cx + dist * Math.cos(v.angle);
-    const ly = cy + dist * Math.sin(v.angle);
-    ctx.fillStyle = '#5c3d20';
-    ctx.font = 'bold 12px "PingFang SC","Noto Sans SC",sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(shortLabels[i], lx, ly);
-  }
-
-  // --- user answers on spokes (inside hexagon) ---
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  for (let i = 0; i < 6; i++) {
-    if (values[i].length === 0) continue;
-    const v = vertices[i];
-    // place text at ~60% from center to vertex
-    const tx = cx + (v.x - cx) * 0.58;
-    const ty = cy + (v.y - cy) * 0.58;
-    const maxW = R * 0.55;
-
-    const lines = wrapText(ctx, values[i], maxW);
-    ctx.fillStyle = '#3a2a1a';
-    ctx.font = '11px "PingFang SC","Noto Sans SC",sans-serif';
-
-    const lineH = 15;
-    const totalH = lines.length * lineH;
-    const startY = ty - totalH / 2 + lineH / 2;
-    for (let j = 0; j < Math.min(lines.length, 3); j++) {
-      const t = lines[j];
-      const display = j === 2 && lines.length > 3 ? t.slice(0, -2) + '…' : t;
-      ctx.fillText(display, tx, startY + j * lineH);
-    }
-  }
-
-  // --- center ---
-  const cr = 54;
-  // outer ring
-  ctx.beginPath();
-  ctx.arc(cx, cy, cr + 4, 0, Math.PI * 2);
-  ctx.fillStyle = 'rgba(139,106,74,0.15)';
-  ctx.fill();
-  // main circle
-  ctx.beginPath();
-  ctx.arc(cx, cy, cr, 0, Math.PI * 2);
-  const cgrad = ctx.createRadialGradient(cx - 10, cy - 10, cr * 0.1, cx, cy, cr);
-  cgrad.addColorStop(0, '#5c3d20');
-  cgrad.addColorStop(1, '#3a2a1a');
-  ctx.fillStyle = cgrad;
-  ctx.fill();
-
-  // center text
-  const centerText = qc || '我的\n为什么';
-  const centerLines = centerText.split('\n');
-  ctx.fillStyle = '#f5f0eb';
-  if (centerLines.length === 1) {
-    const cLines = wrapText(ctx, centerLines[0], cr * 1.6);
-    ctx.font = `bold ${cLines.length > 2 ? '13' : '15'}px "PingFang SC","Noto Sans SC",sans-serif`;
-    cLines.forEach((line, j) => {
-      const off = (j - (cLines.length - 1) / 2) * 18;
-      ctx.fillText(line, cx, cy + off);
+  try {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 120000);
+    const resp = await fetch('http://localhost:8765/generate', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({answers: values}), signal: ctrl.signal
     });
-  } else {
-    ctx.font = 'bold 14px "PingFang SC","Noto Sans SC",sans-serif';
-    ctx.fillText(centerLines[0], cx, cy - 8);
-    ctx.fillText(centerLines[1], cx, cy + 14);
-  }
-
-  // small decorative dots around center
-  for (let a = 0; a < Math.PI * 2; a += Math.PI / 3) {
-    const dx = cx + (cr + 2) * Math.cos(a);
-    const dy = cy + (cr + 2) * Math.sin(a);
-    ctx.beginPath();
-    ctx.arc(dx, dy, 2, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(139,106,74,0.3)';
-    ctx.fill();
-  }
+    clearTimeout(t);
+    if (resp.ok) {
+      const data = await resp.json();
+      if (data.center && data.analysis && data.analysis.length === 6) {
+        renderCard(data.center, data.analysis, getName());
+        saveToBase(getName(), values, data.center);
+        document.getElementById('status').textContent = '';
+        return;
+      }
+    }
+  } catch(_) {}
+  document.getElementById('status').textContent = '';
+  renderCard(values[0] || '出发的理由', null, getName());
 }
 
+/* ── Download with card-back style border ── */
 function downloadImage() {
-  const canvas = document.getElementById('hexCanvas');
-  if (!canvas || canvas.width === 0) {
-    document.getElementById('warn').style.display = 'block';
-    return;
+  const content = document.getElementById('card-content');
+  if (content.style.display === 'none') return;
+
+  const items = document.querySelectorAll('.analysis-item');
+  const analysis = Array.from(items).map(el => el.querySelector('.text').textContent);
+  const centerEl = document.querySelector('.center-reveal');
+  const centerText = centerEl ? centerEl.textContent : '';
+
+  // Call server to render card with PIL
+  const fname = getName();
+  fetch('http://localhost:8765/card', {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({name: fname, analysis, center: centerText})
+  }).then(r => r.blob()).then(blob => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.download = (fname ? fname + '-' : '') + '出发的理由.png';
+    a.href = url; a.click();
+    URL.revokeObjectURL(url);
+  });
+}
+
+function wrapText(ctx, text, maxW) {
+  const lines = []; let cur = '';
+  for (let ch of text) {
+    if (ctx.measureText(cur + ch).width > maxW && cur.length > 0) { lines.push(cur); cur = ch; }
+    else cur += ch;
   }
-  const link = document.createElement('a');
-  link.download = '考前决策六边形.png';
-  link.href = canvas.toDataURL('image/png');
-  link.click();
+  if (cur) lines.push(cur);
+  return lines;
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y);
+  ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h-r);
+  ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  ctx.lineTo(x+r,y+h);
+  ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+  ctx.lineTo(x,y+r);
+  ctx.quadraticCurveTo(x,y,x+r,y);
+  ctx.closePath();
 }
 </script>
 </body>
