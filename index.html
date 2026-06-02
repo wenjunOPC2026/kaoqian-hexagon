@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>考前决策六边形 — Alice</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: "PingFang SC","Noto Sans SC",sans-serif; background: #f5f0eb; color: #2c2416; }
+  .container { max-width: 700px; margin: 0 auto; padding: 40px 20px 80px; }
+
+  .cover { text-align: center; padding: 60px 0 40px; }
+  .cover h1 { font-size: 2.4em; color: #3a2a1a; margin-bottom: 8px; }
+  .cover .sub { color: #8b7355; font-size: 1em; }
+  .cover .brand { color: #a09080; font-size: 0.85em; margin-top: 16px; }
+
+  .q-block { background: #fffaf5; border-radius: 12px; padding: 32px 28px; margin: 20px 0; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
+  .q-block .num { display: inline-block; width: 36px; height: 36px; line-height: 36px; border-radius: 50%; background: #8b6a4a; color: #fff; text-align: center; font-size: 1.1em; font-weight: 700; margin-bottom: 12px; }
+  .q-block .title { font-size: 1.2em; font-weight: 600; margin-bottom: 6px; }
+  .q-block .hint { font-size: 0.9em; color: #8b7355; font-style: italic; margin-bottom: 16px; }
+  .q-block label { display: block; font-size: 0.85em; color: #a09080; margin-bottom: 6px; font-weight: 600; }
+  .q-block input, .q-block textarea { width: 100%; padding: 12px 14px; border: 2px dashed #c4a882; border-radius: 8px; background: #fdfaf5; font-size: 1em; font-family: inherit; resize: vertical; transition: border-color 0.2s; }
+  .q-block input:focus, .q-block textarea:focus { outline: none; border-color: #8b6a4a; border-style: solid; }
+  .q-block textarea { min-height: 60px; }
+  .q-block input { height: 48px; }
+
+  .btn-wrap { text-align: center; margin: 40px 0; }
+  .btn { display: inline-block; padding: 14px 48px; border: none; border-radius: 30px; font-size: 1.15em; font-weight: 600; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; }
+  .btn:active { transform: scale(0.97); }
+  .btn-primary { background: #3a2a1a; color: #f5f0eb; }
+  .btn-primary:hover { box-shadow: 0 4px 16px rgba(58,42,26,0.3); }
+  .btn-outline { background: transparent; border: 2px solid #8b6a4a; color: #8b6a4a; margin-left: 12px; }
+
+  .result { background: #fffaf5; border-radius: 12px; padding: 40px 20px; margin: 40px 0; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  .result h2 { font-size: 1.5em; color: #3a2a1a; margin-bottom: 8px; }
+  .result .subtitle { color: #8b7355; margin-bottom: 24px; }
+
+  canvas { display: block; margin: 0 auto; max-width: 100%; }
+
+  .download-tip { color: #a09080; font-size: 0.85em; margin-top: 16px; }
+  .empty-warn { color: #c0392b; font-size: 0.9em; margin-top: 8px; display: none; }
+  .btn-ai { padding: 10px 18px; border: none; border-radius: 20px; background: linear-gradient(135deg,#6e5ce6,#a29bfe); color: #fff; font-size: 0.9em; font-weight: 600; cursor: pointer; white-space: nowrap; transition: opacity 0.2s; }
+  .btn-ai:hover { opacity: 0.85; }
+  .btn-ai:disabled { opacity: 0.5; cursor: not-allowed; }
+  .ai-status { color: #6e5ce6; font-size: 0.85em; margin-top: 8px; text-align: center; }
+
+  .divider { text-align: center; color: #c4a882; margin: 32px 0; font-size: 0.85em; }
+
+  @media (max-width: 500px) {
+    .cover h1 { font-size: 1.6em; }
+    .q-block { padding: 24px 16px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="cover">
+    <h1>你的「为什么」</h1>
+    <p class="sub">考前决策六边形 · 一个自我对话练习</p>
+    <p class="brand">学姐爱丽丝 | 35岁脱产跨考 | 陪你做对的选择</p>
+  </div>
+
+  <div class="divider">⬡ 填写下方六个问题，生成你的专属六边形 ⬡</div>
+
+  <!-- Q1 -->
+  <div class="q-block">
+    <div class="num">1</div>
+    <div class="title">你为什么要考研？</div>
+    <div class="hint">不假思索，写下脑中冒出的第一个答案。再追问自己：我真正想要的是什么？</div>
+    <label>深层动机</label>
+    <input type="text" id="q1" placeholder="我想……">
+  </div>
+
+  <!-- Q2 -->
+  <div class="q-block">
+    <div class="num">2</div>
+    <div class="title">如果你主动放弃了，最可能的原因是什么？</div>
+    <div class="hint">提前看到路障，才不会被绊倒。</div>
+    <label>风险预警</label>
+    <input type="text" id="q2" placeholder="我最怕……">
+  </div>
+
+  <!-- Q3 -->
+  <div class="q-block">
+    <div class="num">3</div>
+    <div class="title">有人说「都这个年纪了还瞎折腾」，你怎么回答？</div>
+    <div class="hint">只回答给自己听。这不是辩论文，是盔甲。</div>
+    <label>内心防线</label>
+    <input type="text" id="q3" placeholder="我会告诉自己……">
+  </div>
+
+  <!-- Q4 -->
+  <div class="q-block">
+    <div class="num">4</div>
+    <div class="title">如果考上了，你的一天会是什么样子？</div>
+    <div class="hint">闭眼想象30秒。写下你看到、听到、闻到的第一个画面。越具体越好。</div>
+    <label>未来画面</label>
+    <textarea id="q4" placeholder="那一天，我（看到/听到/闻到）……"></textarea>
+  </div>
+
+  <!-- Q5 -->
+  <div class="q-block">
+    <div class="num">5</div>
+    <div class="title">如果没有考上，但坚持到了最后，你会怎样跟朋友讲起？</div>
+    <label>意义锚点</label>
+    <input type="text" id="q5" placeholder="无论结果，我……">
+  </div>
+
+  <!-- Q6 -->
+  <div class="q-block">
+    <div class="num">6</div>
+    <div class="title">有没有另外的人，会因为你的备考行动而变得更好？</div>
+    <div class="hint">会是谁、以什么方式？</div>
+    <label>共赢网络</label>
+    <input type="text" id="q6" placeholder="________ 会因为 ________">
+  </div>
+
+  <!-- Center -->
+  <div class="q-block" style="text-align:center;">
+    <div class="title">中间的那一句</div>
+    <div class="hint">AI 会分析你的六个答案，自动生成——也可以自己写</div>
+    <div style="display:flex; gap:8px; align-items:center;">
+      <input type="text" id="q-center" placeholder="我当初为什么要出发？" style="text-align:center; flex:1;">
+      <button class="btn-ai" onclick="aiGenerate()" id="aiBtn">✨ AI 生成</button>
+    </div>
+  </div>
+
+  <!-- Button -->
+  <div class="btn-wrap">
+    <button class="btn btn-primary" onclick="drawHexagon()">⬡ 生成我的六边形</button>
+    <button class="btn btn-outline" onclick="downloadImage()">📥 下载图片</button>
+    <p class="empty-warn" id="warn">请至少填写 3 个答案再生成。</p>
+    <p class="ai-status" id="aiStatus"></p>
+  </div>
+
+  <!-- Result -->
+  <div class="result" id="result" style="display:none;">
+    <h2>我的考前决策六边形</h2>
+    <p class="subtitle">它不会替你考试，但它会在你想放弃的时候替你自己问一句：你当初为什么要出发？</p>
+    <canvas id="hexCanvas"></canvas>
+    <p class="download-tip">长按或右键可保存图片 · 发给一个你信任的人 · 或者挂在书桌前</p>
+  </div>
+
+</div>
+
+<script>
+function wrapText(ctx, text, maxWidth) {
+  const words = text.split('');
+  const lines = [];
+  let current = '';
+  for (let ch of words) {
+    const test = current + ch;
+    if (ctx.measureText(test).width > maxWidth && current.length > 0) {
+      lines.push(current);
+      current = ch;
+    } else {
+      current = test;
+    }
+  }
+  if (current) lines.push(current);
+  return lines;
+}
+
+function drawHexagon() {
+  const q1 = document.getElementById('q1').value.trim();
+  const q2 = document.getElementById('q2').value.trim();
+  const q3 = document.getElementById('q3').value.trim();
+  const q4 = document.getElementById('q4').value.trim();
+  const q5 = document.getElementById('q5').value.trim();
+  const q6 = document.getElementById('q6').value.trim();
+  const qc = document.getElementById('q-center').value.trim();
+
+  const values = [q1, q2, q3, q4, q5, q6];
+  const filled = values.filter(v => v.length > 0).length;
+  if (filled < 3) {
+    document.getElementById('warn').style.display = 'block';
+    document.getElementById('result').style.display = 'none';
+    return;
+  }
+  document.getElementById('warn').style.display = 'none';
+
+  const result = document.getElementById('result');
+  result.style.display = 'block';
+
+  const canvas = document.getElementById('hexCanvas');
+  const size = Math.min(600, window.innerWidth - 60);
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = size * dpr;
+  canvas.height = size * dpr;
+  canvas.style.width = size + 'px';
+  canvas.style.height = size + 'px';
+
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, size, size);
+
+  const cx = size / 2;
+  const cy = size / 2;
+  const R = size * 0.34;
+
+  // vertex labels
+  const labels = [
+    '① 深层动机',
+    '② 风险预警',
+    '③ 内心防线',
+    '④ 未来画面',
+    '⑤ 意义锚点',
+    '⑥ 共赢网络'
+  ];
+
+  // Calculate vertex positions (top starts at -π/2)
+  const vertices = [];
+  for (let i = 0; i < 6; i++) {
+    const angle = -Math.PI / 2 + (Math.PI / 3) * i;
+    vertices.push({
+      x: cx + R * Math.cos(angle),
+      y: cy + R * Math.sin(angle),
+      angle: angle
+    });
+  }
+
+  // --- draw connecting lines ---
+  ctx.strokeStyle = '#c4a882';
+  ctx.lineWidth = 1.5;
+  ctx.setLineDash([6, 4]);
+  // outer hexagon
+  ctx.beginPath();
+  ctx.moveTo(vertices[0].x, vertices[0].y);
+  for (let i = 1; i < 6; i++) ctx.lineTo(vertices[i].x, vertices[i].y);
+  ctx.closePath();
+  ctx.stroke();
+
+  // spokes to center (skip center dot)
+  // ctx.setLineDash([4, 6]);
+  // ctx.strokeStyle = '#d4c0a8';
+  // ctx.beginPath();
+  // for (let i = 0; i < 6; i++) {
+  //   ctx.moveTo(vertices[i].x, vertices[i].y);
+  //   ctx.lineTo(cx, cy);
+  // }
+  // ctx.stroke();
+  ctx.setLineDash([]);
+
+  // --- draw filled area ---
+  const filledArea = [];
+  for (let i = 0; i < 6; i++) {
+    if (values[i].length > 0) {
+      filledArea.push(vertices[i]);
+    }
+  }
+  if (filledArea.length >= 3) {
+    ctx.fillStyle = 'rgba(139,106,74,0.12)';
+    ctx.beginPath();
+    ctx.moveTo(filledArea[0].x, filledArea[0].y);
+    for (let i = 1; i < filledArea.length; i++) ctx.lineTo(filledArea[i].x, filledArea[i].y);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  // --- draw vertex dots ---
+  for (let i = 0; i < 6; i++) {
+    const v = vertices[i];
+    ctx.beginPath();
+    ctx.arc(v.x, v.y, 5, 0, Math.PI * 2);
+    ctx.fillStyle = values[i].length > 0 ? '#8b6a4a' : '#d4c0a8';
+    ctx.fill();
+  }
+
+  // --- center circle ---
+  ctx.beginPath();
+  ctx.arc(cx, cy, 28, 0, Math.PI * 2);
+  ctx.fillStyle = '#3a2a1a';
+  ctx.fill();
+  ctx.fillStyle = '#f5f0eb';
+  ctx.font = 'bold 13px "PingFang SC","Noto Sans SC",sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  const centerText = qc || '我的\n为什么';
+  const centerLines = centerText.split('\n');
+  if (centerLines.length === 1) {
+    ctx.fillText(centerLines[0], cx, cy);
+  } else {
+    ctx.fillText(centerLines[0], cx, cy - 8);
+    ctx.fillText(centerLines[1], cx, cy + 10);
+  }
+
+  // --- draw labels & values at each vertex ---
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  const fontSize = size < 400 ? 11 : 13;
+
+  for (let i = 0; i < 6; i++) {
+    const v = vertices[i];
+    const angle = v.angle;
+    // label offset outward
+    const labelDist = R + 50;
+    const lx = cx + labelDist * Math.cos(angle);
+    const ly = cy + labelDist * Math.sin(angle);
+
+    // small connector line
+    const edgeDist = R + 10;
+    ctx.strokeStyle = '#c4a882';
+    ctx.lineWidth = 0.8;
+    ctx.beginPath();
+    ctx.moveTo(cx + edgeDist * Math.cos(angle), cy + edgeDist * Math.sin(angle));
+    ctx.lineTo(lx, ly);
+    ctx.stroke();
+
+    // label text
+    ctx.fillStyle = '#5c3d20';
+    ctx.font = `bold ${fontSize}px "PingFang SC","Noto Sans SC",sans-serif`;
+    ctx.fillText(labels[i], lx, ly);
+
+    // value text below label
+    if (values[i].length > 0) {
+      const valLines = wrapText(ctx, values[i], 110);
+      ctx.fillStyle = '#3a2a1a';
+      ctx.font = `${fontSize - 1}px "PingFang SC","Noto Sans SC",sans-serif`;
+      valLines.forEach((line, j) => {
+        ctx.fillText(line, lx, ly + 18 + j * (fontSize + 4));
+      });
+    }
+  }
+}
+
+async function aiGenerate() {
+  const values = [];
+  for (let i = 1; i <= 6; i++) {
+    values.push(document.getElementById('q' + i).value.trim());
+  }
+  const filled = values.filter(v => v.length > 0).length;
+  if (filled < 3) {
+    document.getElementById('aiStatus').textContent = '请先填写至少 3 个问题';
+    return;
+  }
+  const btn = document.getElementById('aiBtn');
+  const status = document.getElementById('aiStatus');
+  btn.disabled = true;
+  btn.textContent = '⏳ 分析中...';
+  status.textContent = '';
+  try {
+    const resp = await fetch('http://localhost:8765/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ answers: values })
+    });
+    const data = await resp.json();
+    document.getElementById('q-center').value = data.center;
+    status.textContent = '已生成，可修改后重新生成六边形';
+  } catch (e) {
+    status.textContent = '请先启动本地服务: python3 hexagon-server.py';
+  }
+  btn.disabled = false;
+  btn.textContent = '✨ AI 生成';
+}
+
+function downloadImage() {
+  const canvas = document.getElementById('hexCanvas');
+  if (!canvas || canvas.width === 0) {
+    document.getElementById('warn').style.display = 'block';
+    return;
+  }
+  const link = document.createElement('a');
+  link.download = '考前决策六边形.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+
+// scroll to result after draw
+const origDraw = drawHexagon;
+drawHexagon = function() {
+  origDraw();
+  setTimeout(() => {
+    document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
+  }, 100);
+};
+</script>
+</body>
+</html>
