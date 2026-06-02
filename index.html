@@ -36,6 +36,8 @@
   .center-block .hint { font-size: 0.85em; color: #8b7355; margin-bottom: 14px; }
   .center-block input { width: 100%; padding: 12px 14px; border: 2px dashed #c4a882; border-radius: 8px; background: #fdfaf5; font-size: 1.05em; font-family: inherit; text-align: center; height: 48px; transition: border-color 0.2s; }
   .center-block input:focus { outline: none; border-color: #8b6a4a; border-style: solid; }
+  .insight { margin-top: 14px; padding: 12px 18px; background: #fdf7f0; border-left: 3px solid #8b6a4a; border-radius: 6px; font-size: 0.9em; color: #5c3d20; line-height: 1.7; text-align: left; display: none; }
+  .insight::before { content: 'AI 发现了什么：'; display: block; font-weight: 700; font-size: 0.8em; color: #8b6a4a; margin-bottom: 4px; letter-spacing: 1px; }
 
   .result { background: #fffaf5; border-radius: 12px; padding: 40px 16px; margin: 40px 0; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
   .result h2 { font-size: 1.5em; color: #3a2a1a; margin-bottom: 8px; }
@@ -117,6 +119,7 @@
     <div class="title">中间的那一句</div>
     <div class="hint">点击「生成六边形」自动生成，也可以自己写</div>
     <input type="text" id="q-center" placeholder="生成六边形时会自动填充……">
+    <div class="insight" id="insight"></div>
   </div>
 
   <div class="btn-wrap">
@@ -154,7 +157,7 @@ function wrapText(ctx, text, maxWidth) {
 
 // --- Auto center sentence ---
 async function autoCenter(values) {
-  // Try local AI server first (2s timeout, don't block the UX)
+  // Try local AI server first (2s timeout)
   try {
     const ctrl = new AbortController();
     const t = setTimeout(() => ctrl.abort(), 2000);
@@ -167,32 +170,19 @@ async function autoCenter(values) {
     clearTimeout(t);
     if (resp.ok) {
       const data = await resp.json();
-      if (data.center && data.center.length > 0) return data.center;
+      if (data.center) {
+        return { center: data.center, insight: data.insight || '' };
+      }
     }
-  } catch (_) { /* fall through to heuristic */ }
+  } catch (_) { /* fall through */ }
 
-  // Heuristic fallback: pick most emotional/longest answer as seed
-  const filled = values.filter(v => v.length > 0);
-  if (filled.length === 0) return '我的为什么';
-
-  // V1 (motive) sets the tone; V4 (vision) provides imagery; V5 (meaning) adds resolve
-  const motive = values[0] || '';
-  const vision = values[3] || '';
-  const meaning = values[4] || '';
-
-  let phrase = '';
-  if (motive && vision) {
-    phrase = motive.replace(/^我想[要]?/, '').replace(/[。，.]/g, '') + '，' + vision.replace(/^那一天[，,]\s*[我]?/, '').replace(/[。，.]/g, '');
-  } else if (motive) {
-    phrase = motive.replace(/[。，.]/g, '');
-  } else if (meaning) {
-    phrase = meaning.replace(/[。，.]/g, '');
-  } else {
-    phrase = filled[0].replace(/[。，.]/g, '');
-  }
-
+  // Heuristic fallback
+  const motive = (values[0] || '').replace(/[。，.]/g, '');
+  const vision = (values[3] || '').replace(/[。，.]/g, '');
+  let phrase = (motive && vision) ? motive + '，' + vision
+    : motive || vision || (values.filter(v=>v).pop() || '').replace(/[。，.]/g, '');
   if (phrase.length > 28) phrase = phrase.slice(0, 28);
-  return phrase || '我的为什么';
+  return { center: phrase || '我的为什么', insight: '' };
 }
 
 // --- Draw ---
@@ -214,9 +204,16 @@ async function generateAndDraw() {
 
   // Auto-fill center
   const centerInput = document.getElementById('q-center');
+  const insightEl = document.getElementById('insight');
   if (!centerInput.value.trim()) {
-    const center = await autoCenter(values);
-    centerInput.value = center;
+    const result = await autoCenter(values);
+    centerInput.value = result.center;
+    if (result.insight) {
+      insightEl.textContent = result.insight;
+      insightEl.style.display = 'block';
+    } else {
+      insightEl.style.display = 'none';
+    }
   }
   statusEl.textContent = '';
 
@@ -252,7 +249,7 @@ function drawCanvas(values, qc) {
 
   const vertices = [];
   for (let i = 0; i < 6; i++) {
-    const angle = -Math.PI / 3 + (Math.PI / 3) * i;
+    const angle = -Math.PI / 2 + (Math.PI / 3) * i;
     vertices.push({ x: cx + R * Math.cos(angle), y: cy + R * Math.sin(angle), angle });
   }
 
