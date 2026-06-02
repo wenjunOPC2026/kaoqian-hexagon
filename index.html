@@ -7,7 +7,7 @@
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: "PingFang SC","Noto Sans SC",sans-serif; background: #f5f0eb; color: #2c2416; }
-  .container { max-width: 700px; margin: 0 auto; padding: 40px 20px 80px; }
+  .container { max-width: 720px; margin: 0 auto; padding: 40px 20px 80px; }
 
   .cover { text-align: center; padding: 60px 0 40px; }
   .cover h1 { font-size: 2.4em; color: #3a2a1a; margin-bottom: 8px; }
@@ -31,24 +31,27 @@
   .btn-primary:hover { box-shadow: 0 4px 16px rgba(58,42,26,0.3); }
   .btn-outline { background: transparent; border: 2px solid #8b6a4a; color: #8b6a4a; margin-left: 12px; }
 
-  .result { background: #fffaf5; border-radius: 12px; padding: 40px 20px; margin: 40px 0; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  .center-block { background: #fffaf5; border-radius: 12px; padding: 28px; margin: 20px 0; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
+  .center-block .title { font-size: 1.2em; font-weight: 600; margin-bottom: 6px; }
+  .center-block .hint { font-size: 0.85em; color: #8b7355; margin-bottom: 14px; }
+  .center-block input { width: 100%; padding: 12px 14px; border: 2px dashed #c4a882; border-radius: 8px; background: #fdfaf5; font-size: 1.05em; font-family: inherit; text-align: center; height: 48px; transition: border-color 0.2s; }
+  .center-block input:focus { outline: none; border-color: #8b6a4a; border-style: solid; }
+
+  .result { background: #fffaf5; border-radius: 12px; padding: 40px 16px; margin: 40px 0; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
   .result h2 { font-size: 1.5em; color: #3a2a1a; margin-bottom: 8px; }
   .result .subtitle { color: #8b7355; margin-bottom: 24px; }
-
   canvas { display: block; margin: 0 auto; max-width: 100%; }
 
   .download-tip { color: #a09080; font-size: 0.85em; margin-top: 16px; }
-  .empty-warn { color: #c0392b; font-size: 0.9em; margin-top: 8px; display: none; }
-  .btn-ai { padding: 10px 18px; border: none; border-radius: 20px; background: linear-gradient(135deg,#6e5ce6,#a29bfe); color: #fff; font-size: 0.9em; font-weight: 600; cursor: pointer; white-space: nowrap; transition: opacity 0.2s; }
-  .btn-ai:hover { opacity: 0.85; }
-  .btn-ai:disabled { opacity: 0.5; cursor: not-allowed; }
-  .ai-status { color: #6e5ce6; font-size: 0.85em; margin-top: 8px; text-align: center; }
+  .warn { color: #c0392b; font-size: 0.9em; margin-top: 8px; display: none; text-align: center; }
+  .status { color: #8b6a4a; font-size: 0.85em; margin-top: 8px; text-align: center; }
 
   .divider { text-align: center; color: #c4a882; margin: 32px 0; font-size: 0.85em; }
 
   @media (max-width: 500px) {
     .cover h1 { font-size: 1.6em; }
-    .q-block { padding: 24px 16px; }
+    .q-block { padding: 24px 14px; }
+    .btn { padding: 12px 32px; font-size: 1em; }
   }
 </style>
 </head>
@@ -63,7 +66,6 @@
 
   <div class="divider">⬡ 填写下方六个问题，生成你的专属六边形 ⬡</div>
 
-  <!-- Q1 -->
   <div class="q-block">
     <div class="num">1</div>
     <div class="title">你为什么要考研？</div>
@@ -72,7 +74,6 @@
     <input type="text" id="q1" placeholder="我想……">
   </div>
 
-  <!-- Q2 -->
   <div class="q-block">
     <div class="num">2</div>
     <div class="title">如果你主动放弃了，最可能的原因是什么？</div>
@@ -81,7 +82,6 @@
     <input type="text" id="q2" placeholder="我最怕……">
   </div>
 
-  <!-- Q3 -->
   <div class="q-block">
     <div class="num">3</div>
     <div class="title">有人说「都这个年纪了还瞎折腾」，你怎么回答？</div>
@@ -90,7 +90,6 @@
     <input type="text" id="q3" placeholder="我会告诉自己……">
   </div>
 
-  <!-- Q4 -->
   <div class="q-block">
     <div class="num">4</div>
     <div class="title">如果考上了，你的一天会是什么样子？</div>
@@ -99,7 +98,6 @@
     <textarea id="q4" placeholder="那一天，我（看到/听到/闻到）……"></textarea>
   </div>
 
-  <!-- Q5 -->
   <div class="q-block">
     <div class="num">5</div>
     <div class="title">如果没有考上，但坚持到了最后，你会怎样跟朋友讲起？</div>
@@ -107,7 +105,6 @@
     <input type="text" id="q5" placeholder="无论结果，我……">
   </div>
 
-  <!-- Q6 -->
   <div class="q-block">
     <div class="num">6</div>
     <div class="title">有没有另外的人，会因为你的备考行动而变得更好？</div>
@@ -116,25 +113,19 @@
     <input type="text" id="q6" placeholder="________ 会因为 ________">
   </div>
 
-  <!-- Center -->
-  <div class="q-block" style="text-align:center;">
+  <div class="center-block">
     <div class="title">中间的那一句</div>
-    <div class="hint">AI 会分析你的六个答案，自动生成——也可以自己写</div>
-    <div style="display:flex; gap:8px; align-items:center;">
-      <input type="text" id="q-center" placeholder="我当初为什么要出发？" style="text-align:center; flex:1;">
-      <button class="btn-ai" onclick="aiGenerate()" id="aiBtn">✨ AI 生成</button>
-    </div>
+    <div class="hint">点击「生成六边形」自动生成，也可以自己写</div>
+    <input type="text" id="q-center" placeholder="生成六边形时会自动填充……">
   </div>
 
-  <!-- Button -->
   <div class="btn-wrap">
-    <button class="btn btn-primary" onclick="drawHexagon()">⬡ 生成我的六边形</button>
+    <button class="btn btn-primary" onclick="generateAndDraw()">⬡ 生成我的六边形</button>
     <button class="btn btn-outline" onclick="downloadImage()">📥 下载图片</button>
-    <p class="empty-warn" id="warn">请至少填写 3 个答案再生成。</p>
-    <p class="ai-status" id="aiStatus"></p>
+    <p class="warn" id="warn">请至少填写 3 个答案再生成。</p>
+    <p class="status" id="status"></p>
   </div>
 
-  <!-- Result -->
   <div class="result" id="result" style="display:none;">
     <h2>我的考前决策六边形</h2>
     <p class="subtitle">它不会替你考试，但它会在你想放弃的时候替你自己问一句：你当初为什么要出发？</p>
@@ -146,10 +137,9 @@
 
 <script>
 function wrapText(ctx, text, maxWidth) {
-  const words = text.split('');
   const lines = [];
   let current = '';
-  for (let ch of words) {
+  for (let ch of text) {
     const test = current + ch;
     if (ctx.measureText(test).width > maxWidth && current.length > 0) {
       lines.push(current);
@@ -162,16 +152,51 @@ function wrapText(ctx, text, maxWidth) {
   return lines;
 }
 
-function drawHexagon() {
-  const q1 = document.getElementById('q1').value.trim();
-  const q2 = document.getElementById('q2').value.trim();
-  const q3 = document.getElementById('q3').value.trim();
-  const q4 = document.getElementById('q4').value.trim();
-  const q5 = document.getElementById('q5').value.trim();
-  const q6 = document.getElementById('q6').value.trim();
-  const qc = document.getElementById('q-center').value.trim();
+// --- Auto center sentence ---
+async function autoCenter(values) {
+  // Try local AI server first
+  try {
+    const resp = await fetch('http://localhost:8765/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ answers: values })
+    });
+    if (resp.ok) {
+      const data = await resp.json();
+      if (data.center && data.center.length > 0) return data.center;
+    }
+  } catch (_) { /* fall through to heuristic */ }
 
-  const values = [q1, q2, q3, q4, q5, q6];
+  // Heuristic fallback: pick most emotional/longest answer as seed
+  const filled = values.filter(v => v.length > 0);
+  if (filled.length === 0) return '我的为什么';
+
+  // V1 (motive) sets the tone; V4 (vision) provides imagery; V5 (meaning) adds resolve
+  const motive = values[0] || '';
+  const vision = values[3] || '';
+  const meaning = values[4] || '';
+
+  let phrase = '';
+  if (motive && vision) {
+    phrase = motive.replace(/^我想[要]?/, '').replace(/[。，.]/g, '') + '，' + vision.replace(/^那一天[，,]\s*[我]?/, '').replace(/[。，.]/g, '');
+  } else if (motive) {
+    phrase = motive.replace(/[。，.]/g, '');
+  } else if (meaning) {
+    phrase = meaning.replace(/[。，.]/g, '');
+  } else {
+    phrase = filled[0].replace(/[。，.]/g, '');
+  }
+
+  if (phrase.length > 28) phrase = phrase.slice(0, 28);
+  return phrase || '我的为什么';
+}
+
+// --- Draw ---
+async function generateAndDraw() {
+  const values = [];
+  for (let i = 1; i <= 6; i++) {
+    values.push(document.getElementById('q' + i).value.trim());
+  }
   const filled = values.filter(v => v.length > 0).length;
   if (filled < 3) {
     document.getElementById('warn').style.display = 'block';
@@ -180,179 +205,189 @@ function drawHexagon() {
   }
   document.getElementById('warn').style.display = 'none';
 
-  const result = document.getElementById('result');
-  result.style.display = 'block';
+  const statusEl = document.getElementById('status');
+  statusEl.textContent = '⏳ 正在生成……';
 
+  // Auto-fill center
+  const centerInput = document.getElementById('q-center');
+  if (!centerInput.value.trim()) {
+    const center = await autoCenter(values);
+    centerInput.value = center;
+  }
+  statusEl.textContent = '';
+
+  const qc = centerInput.value.trim();
+
+  document.getElementById('result').style.display = 'block';
+  drawCanvas(values, qc);
+
+  setTimeout(() => {
+    document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
+  }, 100);
+}
+
+function drawCanvas(values, qc) {
   const canvas = document.getElementById('hexCanvas');
-  const size = Math.min(600, window.innerWidth - 60);
+  const baseSize = Math.min(700, window.innerWidth - 40);
   const dpr = window.devicePixelRatio || 1;
-  canvas.width = size * dpr;
-  canvas.height = size * dpr;
-  canvas.style.width = size + 'px';
-  canvas.style.height = size + 'px';
+  canvas.width = baseSize * dpr;
+  canvas.height = baseSize * dpr;
+  canvas.style.width = baseSize + 'px';
+  canvas.style.height = baseSize + 'px';
 
   const ctx = canvas.getContext('2d');
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  ctx.clearRect(0, 0, size, size);
+  ctx.clearRect(0, 0, baseSize, baseSize);
 
-  const cx = size / 2;
-  const cy = size / 2;
-  const R = size * 0.34;
+  const cx = baseSize / 2;
+  const cy = baseSize / 2;
+  const R = baseSize * 0.33;
 
-  // vertex labels
-  const labels = [
-    '① 深层动机',
-    '② 风险预警',
-    '③ 内心防线',
-    '④ 未来画面',
-    '⑤ 意义锚点',
-    '⑥ 共赢网络'
-  ];
+  const shortLabels = ['深层动机', '风险预警', '内心防线', '未来画面', '意义锚点', '共赢网络'];
+  const colors = ['#c0392b','#e67e22','#8e44ad','#2980b9','#27ae60','#16a085'];
 
-  // Calculate vertex positions (top starts at -π/2)
   const vertices = [];
   for (let i = 0; i < 6; i++) {
     const angle = -Math.PI / 2 + (Math.PI / 3) * i;
-    vertices.push({
-      x: cx + R * Math.cos(angle),
-      y: cy + R * Math.sin(angle),
-      angle: angle
-    });
+    vertices.push({ x: cx + R * Math.cos(angle), y: cy + R * Math.sin(angle), angle });
   }
 
-  // --- draw connecting lines ---
-  ctx.strokeStyle = '#c4a882';
-  ctx.lineWidth = 1.5;
-  ctx.setLineDash([6, 4]);
-  // outer hexagon
+  // --- background glow ---
+  const grad = ctx.createRadialGradient(cx, cy, R * 0.2, cx, cy, R * 1.3);
+  grad.addColorStop(0, 'rgba(139,106,74,0.06)');
+  grad.addColorStop(1, 'rgba(139,106,74,0.0)');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, baseSize, baseSize);
+
+  // --- spokes ---
+  ctx.strokeStyle = 'rgba(180,160,140,0.3)';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([4, 8]);
+  for (let i = 0; i < 6; i++) {
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(vertices[i].x, vertices[i].y);
+    ctx.stroke();
+  }
+  ctx.setLineDash([]);
+
+  // --- filled radar area ---
+  const filledVerts = vertices.filter((_, i) => values[i].length > 0);
+  if (filledVerts.length >= 3) {
+    ctx.fillStyle = 'rgba(139,106,74,0.08)';
+    ctx.strokeStyle = 'rgba(139,106,74,0.2)';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(filledVerts[0].x, filledVerts[0].y);
+    for (let i = 1; i < filledVerts.length; i++) ctx.lineTo(filledVerts[i].x, filledVerts[i].y);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+  }
+
+  // --- outer hexagon ---
+  ctx.strokeStyle = '#8b6a4a';
+  ctx.lineWidth = 2;
   ctx.beginPath();
   ctx.moveTo(vertices[0].x, vertices[0].y);
   for (let i = 1; i < 6; i++) ctx.lineTo(vertices[i].x, vertices[i].y);
   ctx.closePath();
   ctx.stroke();
 
-  // spokes to center (skip center dot)
-  // ctx.setLineDash([4, 6]);
-  // ctx.strokeStyle = '#d4c0a8';
-  // ctx.beginPath();
-  // for (let i = 0; i < 6; i++) {
-  //   ctx.moveTo(vertices[i].x, vertices[i].y);
-  //   ctx.lineTo(cx, cy);
-  // }
-  // ctx.stroke();
-  ctx.setLineDash([]);
-
-  // --- draw filled area ---
-  const filledArea = [];
-  for (let i = 0; i < 6; i++) {
-    if (values[i].length > 0) {
-      filledArea.push(vertices[i]);
-    }
-  }
-  if (filledArea.length >= 3) {
-    ctx.fillStyle = 'rgba(139,106,74,0.12)';
-    ctx.beginPath();
-    ctx.moveTo(filledArea[0].x, filledArea[0].y);
-    for (let i = 1; i < filledArea.length; i++) ctx.lineTo(filledArea[i].x, filledArea[i].y);
-    ctx.closePath();
-    ctx.fill();
-  }
-
-  // --- draw vertex dots ---
+  // --- vertex dots & labels ---
   for (let i = 0; i < 6; i++) {
     const v = vertices[i];
+    const filled = values[i].length > 0;
+
+    // dot
     ctx.beginPath();
-    ctx.arc(v.x, v.y, 5, 0, Math.PI * 2);
-    ctx.fillStyle = values[i].length > 0 ? '#8b6a4a' : '#d4c0a8';
+    ctx.arc(v.x, v.y, 7, 0, Math.PI * 2);
+    ctx.fillStyle = filled ? colors[i] : '#d4c0a8';
     ctx.fill();
+    if (filled) {
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+
+    // label outside vertex
+    const dist = R + 32;
+    const lx = cx + dist * Math.cos(v.angle);
+    const ly = cy + dist * Math.sin(v.angle);
+    ctx.fillStyle = '#5c3d20';
+    ctx.font = 'bold 12px "PingFang SC","Noto Sans SC",sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(shortLabels[i], lx, ly);
   }
 
-  // --- center circle ---
-  ctx.beginPath();
-  ctx.arc(cx, cy, 28, 0, Math.PI * 2);
-  ctx.fillStyle = '#3a2a1a';
-  ctx.fill();
-  ctx.fillStyle = '#f5f0eb';
-  ctx.font = 'bold 13px "PingFang SC","Noto Sans SC",sans-serif';
+  // --- user answers on spokes (inside hexagon) ---
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
+  for (let i = 0; i < 6; i++) {
+    if (values[i].length === 0) continue;
+    const v = vertices[i];
+    // place text at ~60% from center to vertex
+    const tx = cx + (v.x - cx) * 0.58;
+    const ty = cy + (v.y - cy) * 0.58;
+    const maxW = R * 0.55;
+
+    const lines = wrapText(ctx, values[i], maxW);
+    ctx.fillStyle = '#3a2a1a';
+    ctx.font = '11px "PingFang SC","Noto Sans SC",sans-serif';
+
+    const lineH = 15;
+    const totalH = lines.length * lineH;
+    const startY = ty - totalH / 2 + lineH / 2;
+    for (let j = 0; j < Math.min(lines.length, 3); j++) {
+      const t = lines[j];
+      const display = j === 2 && lines.length > 3 ? t.slice(0, -2) + '…' : t;
+      ctx.fillText(display, tx, startY + j * lineH);
+    }
+  }
+
+  // --- center ---
+  const cr = 54;
+  // outer ring
+  ctx.beginPath();
+  ctx.arc(cx, cy, cr + 4, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(139,106,74,0.15)';
+  ctx.fill();
+  // main circle
+  ctx.beginPath();
+  ctx.arc(cx, cy, cr, 0, Math.PI * 2);
+  const cgrad = ctx.createRadialGradient(cx - 10, cy - 10, cr * 0.1, cx, cy, cr);
+  cgrad.addColorStop(0, '#5c3d20');
+  cgrad.addColorStop(1, '#3a2a1a');
+  ctx.fillStyle = cgrad;
+  ctx.fill();
+
+  // center text
   const centerText = qc || '我的\n为什么';
   const centerLines = centerText.split('\n');
+  ctx.fillStyle = '#f5f0eb';
   if (centerLines.length === 1) {
-    ctx.fillText(centerLines[0], cx, cy);
-  } else {
-    ctx.fillText(centerLines[0], cx, cy - 8);
-    ctx.fillText(centerLines[1], cx, cy + 10);
-  }
-
-  // --- draw labels & values at each vertex ---
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  const fontSize = size < 400 ? 11 : 13;
-
-  for (let i = 0; i < 6; i++) {
-    const v = vertices[i];
-    const angle = v.angle;
-    // label offset outward
-    const labelDist = R + 50;
-    const lx = cx + labelDist * Math.cos(angle);
-    const ly = cy + labelDist * Math.sin(angle);
-
-    // small connector line
-    const edgeDist = R + 10;
-    ctx.strokeStyle = '#c4a882';
-    ctx.lineWidth = 0.8;
-    ctx.beginPath();
-    ctx.moveTo(cx + edgeDist * Math.cos(angle), cy + edgeDist * Math.sin(angle));
-    ctx.lineTo(lx, ly);
-    ctx.stroke();
-
-    // label text
-    ctx.fillStyle = '#5c3d20';
-    ctx.font = `bold ${fontSize}px "PingFang SC","Noto Sans SC",sans-serif`;
-    ctx.fillText(labels[i], lx, ly);
-
-    // value text below label
-    if (values[i].length > 0) {
-      const valLines = wrapText(ctx, values[i], 110);
-      ctx.fillStyle = '#3a2a1a';
-      ctx.font = `${fontSize - 1}px "PingFang SC","Noto Sans SC",sans-serif`;
-      valLines.forEach((line, j) => {
-        ctx.fillText(line, lx, ly + 18 + j * (fontSize + 4));
-      });
-    }
-  }
-}
-
-async function aiGenerate() {
-  const values = [];
-  for (let i = 1; i <= 6; i++) {
-    values.push(document.getElementById('q' + i).value.trim());
-  }
-  const filled = values.filter(v => v.length > 0).length;
-  if (filled < 3) {
-    document.getElementById('aiStatus').textContent = '请先填写至少 3 个问题';
-    return;
-  }
-  const btn = document.getElementById('aiBtn');
-  const status = document.getElementById('aiStatus');
-  btn.disabled = true;
-  btn.textContent = '⏳ 分析中...';
-  status.textContent = '';
-  try {
-    const resp = await fetch('http://localhost:8765/generate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ answers: values })
+    const cLines = wrapText(ctx, centerLines[0], cr * 1.6);
+    ctx.font = `bold ${cLines.length > 2 ? '13' : '15'}px "PingFang SC","Noto Sans SC",sans-serif`;
+    cLines.forEach((line, j) => {
+      const off = (j - (cLines.length - 1) / 2) * 18;
+      ctx.fillText(line, cx, cy + off);
     });
-    const data = await resp.json();
-    document.getElementById('q-center').value = data.center;
-    status.textContent = '已生成，可修改后重新生成六边形';
-  } catch (e) {
-    status.textContent = '请先启动本地服务: python3 hexagon-server.py';
+  } else {
+    ctx.font = 'bold 14px "PingFang SC","Noto Sans SC",sans-serif';
+    ctx.fillText(centerLines[0], cx, cy - 8);
+    ctx.fillText(centerLines[1], cx, cy + 14);
   }
-  btn.disabled = false;
-  btn.textContent = '✨ AI 生成';
+
+  // small decorative dots around center
+  for (let a = 0; a < Math.PI * 2; a += Math.PI / 3) {
+    const dx = cx + (cr + 2) * Math.cos(a);
+    const dy = cy + (cr + 2) * Math.sin(a);
+    ctx.beginPath();
+    ctx.arc(dx, dy, 2, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(139,106,74,0.3)';
+    ctx.fill();
+  }
 }
 
 function downloadImage() {
@@ -366,15 +401,6 @@ function downloadImage() {
   link.href = canvas.toDataURL('image/png');
   link.click();
 }
-
-// scroll to result after draw
-const origDraw = drawHexagon;
-drawHexagon = function() {
-  origDraw();
-  setTimeout(() => {
-    document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
-  }, 100);
-};
 </script>
 </body>
 </html>
