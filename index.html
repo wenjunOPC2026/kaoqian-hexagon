@@ -154,13 +154,17 @@ function wrapText(ctx, text, maxWidth) {
 
 // --- Auto center sentence ---
 async function autoCenter(values) {
-  // Try local AI server first
+  // Try local AI server first (2s timeout, don't block the UX)
   try {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 2000);
     const resp = await fetch('http://localhost:8765/generate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ answers: values })
+      body: JSON.stringify({ answers: values }),
+      signal: ctrl.signal
     });
+    clearTimeout(t);
     if (resp.ok) {
       const data = await resp.json();
       if (data.center && data.center.length > 0) return data.center;
